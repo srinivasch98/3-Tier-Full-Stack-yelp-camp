@@ -3,7 +3,7 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-#all two package files will be copy
+#all two package files  package.json and package-lock.json copies
 COPY package*.json ./
 
 RUN npm ci
