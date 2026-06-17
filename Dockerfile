@@ -1,20 +1,25 @@
-# Use Node 18 as parent image
-FROM node:18
+# Build Stage
+FROM node:18-alpine AS builder
 
-# Change the working directory on the Docker image to /app
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the /app directory
-COPY package.json package-lock.json ./
+#all two package files will be copy
+COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+RUN npm ci
 
-# Copy the rest of project files into this image
 COPY . .
 
-# Expose application port
+# Runtime Stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app .
+
 EXPOSE 3000
 
-# Start the application
-CMD npm start
+CMD ["npm", "start"]
